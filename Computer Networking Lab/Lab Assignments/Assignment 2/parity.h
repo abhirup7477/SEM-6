@@ -22,3 +22,14 @@ char countParity(char *str, char *parity){
 
    return p;
 }
+
+void display(char *str, char *prompt, int type){
+    int len = strlen(str), i = 0;
+    printf("%s",prompt);
+    for(i=0; i<len-1; i++)
+        printf("%c ",str[i]);
+    if(type == 0)
+        printf("%c\n",str[i]);
+    else 
+        printf("(%c)\n",str[i]);
+}

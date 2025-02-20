@@ -23,12 +23,25 @@ void main(){
     client_addr_len = sizeof(client_addr);
     int cfd = accept(sktfd, (struct sockaddr *) &client_addr, &client_addr_len);
 
-    char str[size-1], parity[size];
-    read(cfd, str, sizeof(str));
-    puts(str);
-    countParity(str, parity);
-    puts(parity);
-    write(cfd, parity, sizeof(parity));
+    while(1){
+        char str[size-1], parity[size];
+        read(cfd, str, sizeof(str));
+
+        if(!strcmp(str, "end")){
+            write(cfd, str, sizeof(str));
+            break;
+        }
+
+        display(str, "Reveived data : ", 0);
+        char p = countParity(str, parity);
+        display(parity, "Modified data: ", 1);
+        printf("Parity = %c\n",p);
+        
+        write(cfd, parity, sizeof(parity));
+        puts("");
+    }
+
+    printf("Server program terminating\n");
 
     close(cfd);
     unlink(path);

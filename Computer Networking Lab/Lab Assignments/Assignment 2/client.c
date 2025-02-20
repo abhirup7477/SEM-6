@@ -21,14 +21,23 @@ void main(){
         puts("ERROR");
 
     char str[size-1], parity[size];
-    printf("Input : ");
-    fgets(str, size-2, stdin);
-    str[strlen(str) - 1] = '\0';
-    puts(str);
+    while(1){
+        printf("Input : ");
+        fgets(str, size-2, stdin);
+        str[strlen(str) - 1] = '\0';
 
-    write(sktfd, str, sizeof(str));
-    read(sktfd, parity, sizeof(parity));
-    puts(parity);
+        write(sktfd, str, sizeof(str));
+        read(sktfd, parity, sizeof(parity));
+
+        if(!strcmp(parity, "end")){
+            break;
+        }
+        display(str, "Input data : ", 0);
+        display(parity, "Modified data : ", 1);
+        puts("");
+    }
+
+    printf("\nClient program terminating\n");
 
     close(sktfd);
     unlink(path);
