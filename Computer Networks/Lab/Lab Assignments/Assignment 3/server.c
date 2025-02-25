@@ -11,9 +11,7 @@
 
 int addRedundantBits(char *data, char *divisor,  char *result){
 	int n = strlen(divisor) - 1;
-    // printf("n = %d\n",n);
 	strcpy(result, data);
-    // puts(result);
 	int j = strlen(data);
 	for(int i=1; i<=n; i++){
 		result[j++] = '0';
@@ -29,7 +27,6 @@ int convert_decimal(char *str){
 		int r = (str[i] - '0') * pow(2, j++);
 		n += r;
 	}
-	// printf("%s => %d\n",str, n);
 	return n;
 }
 
@@ -52,15 +49,13 @@ void convert_binary(int n, char *str){
 	}
 	str[i] = '\0';
 	reverse(str);
-    // printf("tobin :: %d => %s\n",x, str);
 }
 
 void crc(char *data, char *divisor, char *result){
 	int r = addRedundantBits(data, divisor, result);
-	// printf("Result = %s\n",result);
     
     int divisor_len = strlen(divisor), i;
-    char dvnd[divisor_len+1], dvsr[divisor_len+1], rmndr[divisor_len];
+    char dvnd[divisor_len+1];
     int end = divisor_len, result_len = strlen(result);
 
     for(i=0; i<end; i++){
@@ -71,41 +66,27 @@ void crc(char *data, char *divisor, char *result){
     int num = convert_decimal(dvnd);
     int d = convert_decimal(divisor);
     int res, frst;
-    char str1[100], str2[100], str3[100];
+    
     while(end <= result_len){
-        // printf("\nresult_len = %d   end = %d\n",result_len, end);
         frst = num;
         for(int i=1; i < divisor_len; i++)
             frst = frst >> 1;
-        // printf("frst = %d\n",frst);
+        
         if(frst == 1)
             res = num ^ d;
         else 
             res = num ^ 0;
-        
-        // printf("num = %d d = %d res = %d\n",num, d, res);
-        // convert_binary(num, str1);
-        // convert_binary(d, str2);
-        // convert_binary(res, str3);
-        // printf("num = %s d = %s res = %s\n",str1, str2, str3);
 
         num = res;
         res = res << 1;
-        // printf("res = %d  result[end] = %d\n",res, result[end]);
 
         if(end != result_len)
             num = res | (result[end] - '0');
-
-        // convert_binary(num, str1);
-        // convert_binary(res, str3);
-        // printf("num = %s d = %s res = %s\n",str1, str2, str3);
-
         end++;
     }
     res = convert_decimal(result);
     res += num;
     convert_binary(res, result);
-    // puts(result);
 }
 
 void main(){
@@ -134,9 +115,6 @@ void main(){
 
 		read(cfd, data, sizeof(data));
 		read(cfd, divisor, sizeof(divisor));
-
-		// puts(data);
-		// puts(divisor);
 
 		if(!strcmp(data, "end") || !strcmp(divisor, "end")){
 			break;

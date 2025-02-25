@@ -36,14 +36,12 @@ void main(){
 		write(sfd, data, sizeof(data));
 		write(sfd, divisor, sizeof(divisor));
 
-		// puts(data);
-		// puts(divisor);
-
 		if(!strcmp(data, "end") || !strcmp(divisor, "end")){
 			break;
 		}
 		
 		read(sfd, result, sizeof(result));
+		
 		printf("\nData = %s\n",data);
 		printf("Divisor = %s\n",divisor);
 		printf("Result = %s\n",result);
