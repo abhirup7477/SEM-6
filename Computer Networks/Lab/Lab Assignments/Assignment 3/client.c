@@ -50,7 +50,7 @@ void main(){
 		puts("");
 	}
 	
-	puts("\nServer is terminating\n");
+	puts("\nClient is terminating\n");
 
 	close(sfd);
 	unlink(path);

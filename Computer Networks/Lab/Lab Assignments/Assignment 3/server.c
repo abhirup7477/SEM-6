@@ -150,7 +150,7 @@ void main(){
 		puts("");
 	}
 	
-	puts("\nerver is terminating\n");
+	puts("\nServer is terminating\n");
 
 	close(cfd);
 	unlink(path);
