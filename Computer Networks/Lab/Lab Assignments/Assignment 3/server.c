@@ -55,24 +55,23 @@ void crc(char *data, char *divisor, char *result){
 	int r = addRedundantBits(data, divisor, result);
     
     int divisor_len = strlen(divisor), i;
-    char dvnd[divisor_len+1];
+    char dvnd[divisor_len+1], dvsr[divisor_len+1], rmndr[divisor_len];
     int end = divisor_len, result_len = strlen(result);
 
     for(i=0; i<end; i++){
-        dvnd[i] = data[i];
+        dvnd[i] = result[i];
     }
     dvnd[end] = '\0';
     
     int num = convert_decimal(dvnd);
     int d = convert_decimal(divisor);
     int res, frst;
-    
+    char str1[100], str2[100], str3[100];
     while(end <= result_len){
         frst = num;
-        for(int i=1; i < divisor_len; i++)
-            frst = frst >> 1;
         
-        if(frst == 1)
+        frst = log2(frst) + 1;
+        if(frst == divisor_len)
             res = num ^ d;
         else 
             res = num ^ 0;
@@ -82,11 +81,16 @@ void crc(char *data, char *divisor, char *result){
 
         if(end != result_len)
             num = res | (result[end] - '0');
+
+        convert_binary(num, str1);
+        convert_binary(res, str3);
+
         end++;
     }
     res = convert_decimal(result);
     res += num;
     convert_binary(res, result);
+    puts(result);
 }
 
 void main(){
@@ -128,7 +132,7 @@ void main(){
 		puts("");
 	}
 	
-	puts("\nServer is terminating\n");
+	puts("\nerver is terminating\n");
 
 	close(cfd);
 	unlink(path);
