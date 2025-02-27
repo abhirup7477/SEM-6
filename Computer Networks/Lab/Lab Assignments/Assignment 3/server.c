@@ -70,12 +70,18 @@ void crc(char *data, char *divisor, char *result){
     while(end <= result_len){
         frst = num;
         
-        frst = log2(frst) + 1;
-        if(frst == divisor_len)
+        // frst = log2(frst) + 1;
+        // if(frst == divisor_len)
+        //     res = num ^ d;
+        // else 
+        //     res = num ^ 0;
+
+		frst = frst >> (divisor_len - 1);
+		if(frst == 1)
             res = num ^ d;
         else 
             res = num ^ 0;
-
+		
         num = res;
         res = res << 1;
 
