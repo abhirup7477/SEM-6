@@ -76,8 +76,8 @@ void crc(char *data, char *divisor, char *result){
         // else 
         //     res = num ^ 0;
 
-		frst = frst >> (divisor_len - 1);
-		if(frst == 1)
+	frst = frst >> (divisor_len - 1);
+	if(frst == 1)
             res = num ^ d;
         else 
             res = num ^ 0;
