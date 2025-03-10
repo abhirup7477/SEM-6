@@ -26,7 +26,6 @@ void main(){
             for(j=0; j<size; j++){
                 roll.msg[j] = str[i++];
             }
-            // print(roll.msg, size);
             msgsnd(fd, (void*) &roll, sizeof(roll.msg), 0);
             i --;
         }

@@ -21,11 +21,9 @@ void main(){
         printf("Receiver is waiting\n\n");
 
         msgrcv(fd, (void *)&roll, sizeof(roll.msg), 1, 0);
-        // print(roll.msg, size);
         if(!strcmp(roll.msg, "000"))
             break;
 
-        // printf("After break\n");
         for(i=0; i<size; i++){
             str[i] = roll.msg[i];
         }
@@ -33,7 +31,6 @@ void main(){
             msgrcv(fd, (void *)&roll, sizeof(roll.msg), 1, 0);
             if(!strcmp(roll.msg, "ok"))
                 break;
-            // print(roll.msg, size);
             for(j=0; j<size; j++){
                 str[i++] = roll.msg[j];
             }
