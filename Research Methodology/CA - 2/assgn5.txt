@@ -1,0 +1,122 @@
+-- Creating the Employee table
+CREATE TABLE Employee (
+    emp_no INT PRIMARY KEY,
+    name VARCHAR(50),
+    dob DATE,
+    sex CHAR(1),
+    address VARCHAR(255),
+    salary DECIMAL(10,2)
+);
+
+-- Creating the Company table
+CREATE TABLE Company (
+    comp_no VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(100),
+    address VARCHAR(255)
+);
+
+-- Creating the Works table
+CREATE TABLE Works (
+    emp_no INT,
+    comp_no VARCHAR(10),
+    FOREIGN KEY (emp_no) REFERENCES Employee(emp_no),
+    FOREIGN KEY (comp_no) REFERENCES Company(comp_no)
+);
+
+-- Populating Employee table
+INSERT INTO Employee VALUES
+(1, 'Alice', '1995-08-12', 'F', 'Delhi', 50000),
+(2, 'Bob', '2000-06-25', 'M', 'Mumbai', 60000),
+(3, 'Clara', '2002-11-15', 'F', 'Kolkata', 55000),
+(4, 'David', '1999-03-10', 'M', 'Chennai', 70000),
+(5, 'Emma', '2010-07-19', 'F', 'Pune', 65000);
+
+-- Populating Company table
+INSERT INTO Company VALUES
+('C00001', 'Tech Solutions', 'Mumbai'),
+('C00002', 'Innovate Ltd.', 'Kolkata'),
+('C00003', 'Clifford Corp', 'Delhi'),
+('C00004', 'Future Systems', 'Bangalore');
+
+-- Populating Works table
+INSERT INTO Works VALUES
+(1, 'C00001'),
+(2, 'C00002'),
+(3, 'C00003'),
+(4, 'C00004'),
+(5, 'C00002');
+
+-- Queries
+
+-- 1. List employees who work for company 'C00002'
+SELECT Employee.* FROM Employee 
+JOIN Works ON Employee.emp_no = Works.emp_no 
+WHERE Works.comp_no = 'C00002';
+
+-- 2. List employees who work for company 'C00004'
+SELECT Employee.* FROM Employee 
+JOIN Works ON Employee.emp_no = Works.emp_no 
+WHERE Works.comp_no = 'C00004';
+
+-- 3. List employees who work for Clifford Corp
+SELECT Employee.* FROM Employee 
+JOIN Works ON Employee.emp_no = Works.emp_no 
+JOIN Company ON Works.comp_no = Company.comp_no 
+WHERE Company.name = 'Clifford Corp';
+
+-- 4. List employees whose name ends with 'a'
+SELECT * FROM Employee WHERE name LIKE '%a';
+
+-- 5. List employees born between 1999 and 2011
+SELECT * FROM Employee WHERE dob BETWEEN '1999-01-01' AND '2011-12-31';
+
+-- 6. List the names of all clients having 'a' as the third letter in their names
+SELECT name FROM Clients WHERE name LIKE '__a%';
+
+-- 7. List the clients who stay in a city whose first letter is 'K'
+SELECT * FROM Clients WHERE city LIKE 'K%';
+
+-- 8. List all the clients who stay in 'Mumbai' or 'Kolkata'
+SELECT * FROM Clients WHERE city IN ('Mumbai', 'Kolkata');
+
+-- 9. List all the clients whose BalDue is greater than value 1000
+SELECT * FROM Clients WHERE BalDue > 1000;
+
+-- 10. List all information from the Sales_Order table for orders placed in the month of June
+SELECT * FROM Sales_Order WHERE MONTH(Order_Date) = 6;
+
+-- 11. List the order information for Client_no 'C00001' and 'C00003'
+SELECT * FROM Sales_Order WHERE Client_no IN ('C00001', 'C00003');
+
+-- 12. List products whose selling price is greater than 500 and less than or equal to 750
+SELECT * FROM Products WHERE Selling_Price > 500 AND Selling_Price <= 750;
+
+-- 13. Count the total number of orders
+SELECT COUNT(*) AS total_orders FROM Sales_Order;
+
+-- 14. Determine the maximum and minimum product prices
+SELECT MAX(Selling_Price) AS max_price, MIN(Selling_Price) AS min_price FROM Products;
+
+-- 15. Count the number of clients who live in Kolkata
+SELECT COUNT(*) FROM Clients WHERE city = 'Kolkata';
+
+-- 16. Count the number of products having price less than or equal to 500
+SELECT COUNT(*) FROM Products WHERE Selling_Price <= 500;
+
+-- 17. List the order number and day on which clients placed their order
+SELECT Order_No, DAYNAME(Order_Date) AS order_day FROM Sales_Order;
+
+-- 18. List the Order_Date in the format 'DD-Month-YY'
+SELECT DATE_FORMAT(Order_Date, '%d-%M-%y') AS formatted_date FROM Sales_Order;
+
+-- 19. List the date, 20 days after today's date
+SELECT DATE_ADD(CURDATE(), INTERVAL 20 DAY) AS future_date;
+
+-- 20. List name of the client who has maximum BalDue
+SELECT name FROM Clients WHERE BalDue = (SELECT MAX(BalDue) FROM Clients);
+
+-- 21. Find the difference between maximum BalDue and minimum BalDue
+SELECT MAX(BalDue) - MIN(BalDue) AS baldue_difference FROM Clients;
+
+-- 22. Add Rs.1000/- with the salary amount of every salesman
+UPDATE Employee SET salary = salary + 1000 WHERE emp_no IN (SELECT emp_no FROM Salesmen);

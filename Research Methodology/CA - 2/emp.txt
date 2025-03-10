@@ -1,0 +1,67 @@
+-- Create the tables
+CREATE TABLE employee (
+    emp_no VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(100),
+    dob DATE,
+    sex CHAR(1),
+    address VARCHAR(255),
+    salary DECIMAL(10,2)
+);
+
+CREATE TABLE company (
+    comp_no VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(100),
+    address VARCHAR(255)
+);
+
+CREATE TABLE works (
+    emp_no VARCHAR(10),
+    comp_no VARCHAR(10),
+    PRIMARY KEY (emp_no, comp_no),
+    FOREIGN KEY (emp_no) REFERENCES employee(emp_no),
+    FOREIGN KEY (comp_no) REFERENCES company(comp_no)
+);
+
+-- Insert sample values
+INSERT INTO employee VALUES
+('E00001', 'Alice', '1995-06-15', 'F', '123 Main St', 50000.00),
+('E00002', 'Robert', '2000-03-22', 'M', '456 Oak St', 60000.00),
+('E00003', 'Linda', '1998-11-12', 'F', '789 Pine St', 55000.00),
+('E00004', 'Marta', '2005-07-18', 'F', '321 Cedar St', 45000.00),
+('E00005', 'John', '2010-12-30', 'M', '654 Elm St', 40000.00);
+
+INSERT INTO company VALUES
+('C00001', 'Alpha Ltd', '100 Alpha St'),
+('C00002', 'Beta Inc', '200 Beta St'),
+('C00003', 'Clifford Corp', '300 Clifford St'),
+('C00004', 'Delta LLC', '400 Delta St');
+
+INSERT INTO works VALUES
+('E00001', 'C00001'),
+('E00002', 'C00002'),
+('E00003', 'C00003'),
+('E00004', 'C00004'),
+('E00005', 'C00002');
+
+-- Queries
+-- 1. List the employees who work for company 'C00002'
+SELECT e.* FROM employee e
+JOIN works w ON e.emp_no = w.emp_no
+WHERE w.comp_no = 'C00002';
+
+-- 2. List the employees who work for company 'C00004'
+SELECT e.* FROM employee e
+JOIN works w ON e.emp_no = w.emp_no
+WHERE w.comp_no = 'C00004';
+
+-- 3. List the employees who work for Clifford Corp
+SELECT e.* FROM employee e
+JOIN works w ON e.emp_no = w.emp_no
+JOIN company c ON w.comp_no = c.comp_no
+WHERE c.name = 'Clifford Corp';
+
+-- 4. List the employees whose name ends with 'a'
+SELECT * FROM employee WHERE name LIKE '%a';
+
+-- 5. List the employees born between 1999 and 2011
+SELECT * FROM employee WHERE dob BETWEEN '1999-01-01' AND '2011-12-31';
