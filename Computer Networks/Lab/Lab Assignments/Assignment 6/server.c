@@ -13,6 +13,9 @@
 
 int isValid(char *str){
     int i, j, count=0, n = strlen(str), sum=0;
+
+    if(str[0] == '.' || str[n-1] == '.')
+        return 0;
     for(i=0; i<n; i++){
         if(!isdigit(str[i]) && str[i]!='.'){
             //puts("Condition - 1");
@@ -24,6 +27,8 @@ int isValid(char *str){
         }
         else{
             //puts("Condition - 3");
+            if(str[i+1] == '.')
+                return 0;
             count++;
             if(count > 3)
                 return 0;
@@ -33,7 +38,7 @@ int isValid(char *str){
 
         }
     }
-    if(count < 3)
+    if(count != 3)
         return 0;
     return 1;
 }
