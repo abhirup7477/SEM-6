@@ -1,37 +1,41 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <unistd.h>
+#include <arpa/inet.h>
 
-#define MY_SOCK_PATH "/somepath"
-#define LISTEN_BACKLOG 50
+#define key 1234
+#define port 4444
+#define size 50
+#define path "socket_path"
 
-#define handle_error(msg) \
-    do { perror(msg); exit(EXIT_FAILURE); } while (0)
+void main(){
+    struct sockaddr_in addr;
+    int sfd;
+    char msg[2*size];
+    unlink(path);
 
-int main(void)
-{
-    int                 sfd, r;
-    struct sockaddr_un  my_addr;
-   
-    sfd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sfd == -1)
-        handle_error("socket");
+    sfd = socket(AF_INET, SOCK_STREAM, 0);
 
-    memset(&my_addr, 0, sizeof(my_addr));
-    my_addr.sun_family = AF_UNIX;
-    strncpy(my_addr.sun_path, MY_SOCK_PATH,
-            sizeof(my_addr.sun_path) - 1);
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    addr.sin_port = htons(4444);
 
-    r = connent(sfd, (struct sockaddr *) &my_addr,
-                sizeof(my_addr));
-    if (r == -1)
-        handle_error("connect");
+    connect(sfd, (struct sockaddr *)&addr, sizeof(addr));
 
-    /* Code to deal with incoming connection(s)... */
+    while(1){
+        printf("Enter the data : ");
+        fgets(msg, size, stdin);
+        msg[strlen(msg) - 1] = '\0';
 
-    if (close(sfd) == -1)
-        handle_error("close");
+        write(sfd, msg, sizeof(msg));
+        if(!strcmp(msg, "0000"))
+            break;
+
+        read(sfd, msg, sizeof(msg));
+        printf("Processed data : %s\n\n",msg);
+    }
+    printf("\nClient is terminating\n");
+    close(sfd);
 }

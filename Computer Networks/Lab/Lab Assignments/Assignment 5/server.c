@@ -1,54 +1,70 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <unistd.h>
+#include <arpa/inet.h>
 
-#define MY_SOCK_PATH "/somepath"
-#define LISTEN_BACKLOG 50
+#define key 1234
+#define port 4444
+#define size 50
+#define path "socket_path"
 
-#define handle_error(msg) \
-    do { perror(msg); exit(EXIT_FAILURE); } while (0)
+void bitstuffing(char *str, char *result){
+    int n = strlen(str), i=0, j=0, count = 0;
+    while(i < n){
+        result[j++] = str[i];
+        if(str[i] == '0'){
+            if(count == 4){
+                result[j++] = '1';
+                count = 0;
+            }
+            else{
+                count ++;
+            }
+        }
+        else{
+            count = 0;
+        }
+        i++;
+    }
+    result[j] = '\0';
+}
 
-int main(void)
-{
-    int                 sfd, cfd;
-    socklen_t           peer_addr_size;
-    struct sockaddr_un  my_addr, peer_addr;
-    if (unlink(MY_SOCK_PATH) == -1)
-        handle_error("unlink");
+void main(){
+    struct sockaddr_in addr, caddr;
+    int sfd, cfd, caddr_len;
+    char msg[2*size], result[2*size];
+    unlink(path);
 
-    sfd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sfd == -1)
-        handle_error("socket");
+    sfd = socket(AF_INET, SOCK_STREAM, 0);
 
-    memset(&my_addr, 0, sizeof(my_addr));
-    my_addr.sun_family = AF_UNIX;
-    strncpy(my_addr.sun_path, MY_SOCK_PATH,
-            sizeof(my_addr.sun_path) - 1);
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    addr.sin_port = htons(4444);
 
-    if (bind(sfd, (struct sockaddr *) &my_addr,
-            sizeof(my_addr)) == -1)
-        handle_error("bind");
+    bind(sfd, (struct sockaddr *) &addr, sizeof(addr));
+    listen(sfd, 1);
 
-    if (listen(sfd, LISTEN_BACKLOG) == -1)
-        handle_error("listen");
+    caddr_len = sizeof(caddr);
+    cfd = accept(sfd, (struct sockaddr *)&addr, &caddr_len);
 
-    /* Now we can accept incoming connections one
-        at a time using accept(2). */
+    while(1){
+        printf("Server is waiting\n\n");
 
-    peer_addr_size = sizeof(peer_addr);
-    cfd = accept(sfd, (struct sockaddr *) &peer_addr,
-                &peer_addr_size);
-    if (cfd == -1)
-        handle_error("accept");
+        read(cfd, msg, sizeof(msg));
+        if(!strcmp(msg, "0000"))
+            break;
+        printf("Received data : %s\n",msg);
 
-    /* Code to deal with incoming connection(s)... */
-
-    if (close(cfd) == -1)
-        handle_error("close");
-
-    if (unlink(MY_SOCK_PATH) == -1)
-        handle_error("unlink");
+        bitstuffing(msg, result);
+        strcpy(msg, result);
+        printf("Processed data : %s\n",msg);
+        write(cfd, msg, sizeof(msg));
+        puts("");
+    }
+    printf("Server is terminating\n");
+    usleep(1000);
+    close(cfd);
+    unlink(path);
 }

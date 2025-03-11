@@ -28,6 +28,7 @@ void bitstuffing(char *str, char *result){
         }
         i++;
     }
+    result[j] = '\0';
 }
 
 void main(){
