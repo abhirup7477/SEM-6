@@ -8,13 +8,11 @@
 #define key 1234
 #define port 4444
 #define size 50
-#define path "socket_path"
 
 void main(){
     struct sockaddr_in addr;
     int sfd;
     char msg[size];
-    unlink(path);
 
     sfd = socket(AF_INET, SOCK_STREAM, 0);
 

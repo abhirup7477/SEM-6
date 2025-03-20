@@ -1,0 +1,164 @@
+CREATE TABLE CLIENT_MASTER(
+Client_no VARCHAR2(6) CHECK (Client_no LIKE 'C%') PRIMARY KEY,
+Name VARCHAR2(20) NOT NULL,
+City VARCHAR2(15),
+Pincode NUMBER(8),
+State VARCHAR2(15),
+BalDue NUMBER(10, 2)
+)
+
+CREATE TABLE PRODUCT_MASTER(
+Product_no VARCHAR2(6) CHECK (Product_no LIKE 'P%') PRIMARY KEY,
+Description VARCHAR(15) NOT NULL,
+QTY_ON_HAND NUMBER(8) NOT NULL,
+Sell_Price NUMBER(8, 2) CHECK (Sell_Price > 0) NOT NULL,
+Cost_Price NUMBER(8, 2) CHECK (Cost_Price > 0) NOT NULL
+)
+  
+CREATE TABLE SALESMAN_MASTER (
+Salesman_no VARCHAR2(6) CHECK (Salesman_no LIKE 'S%') PRIMARY KEY,
+Salesman_name VARCHAR2(20) NOT NULL,
+City VARCHAR2(20) NOT NULL,
+Pincode NUMBER(8) NOT NULL,
+State VARCHAR2(20) NOT NULL,
+Sal_Amt NUMBER(8, 2) CHECK (Sal_Amt > 0) NOT NULL
+)
+
+CREATE TABLE SALES_ORDER (
+Order_no VARCHAR2(6) CHECK (Order_no LIKE 'O%') PRIMARY KEY,
+Client_no VARCHAR2(6) REFERENCES CLIENT_MASTER(Client_no) ON DELETE CASCADE,
+Order_date DATE,
+Salesman_no VARCHAR2(6) REFERENCES SALESMAN_MASTER(Salesman_no) ON DELETE CASCADE,
+Dely_type CHAR(1) DEFAULT 'F' CHECK (Dely_type='P' OR Dely_type='F'),
+Dely_date DATE
+)
+
+CREATE TABLE SALES_ORDER_DETAILS (
+Order_no VARCHAR2(6) REFERENCES SALES_ORDER(Order_no) ON DELETE CASCADE,
+Product_no VARCHAR2(6) REFERENCES PRODUCT_MASTER(Product_no) ON DELETE CASCADE,
+Qty_disp NUMBER(8),
+Product_rate NUMBER(10, 2)
+)
+
+insert into client_master values('C001', 'Abhirup Bag', 'Kolkata', '712702', 'West Bengal', '500');
+insert into client_master values('C002', 'Abhrajit Rath', 'Kolkata', '712712', 'West Bengal', '1000');
+insert into client_master values('C003', 'Arnab Chattopadhyay', 'Chennai', '712716', 'Kerala', '870.65');
+insert into client_master values('C004', 'Suman Mondal', 'Mumbai', '712720', 'Maharastra', '444');
+insert into client_master values('C005', 'Aniket Ghosh', 'Delhi', '712724', 'Delhi', '500.50');
+insert into client_master values('C006', 'Susmita Das', 'Bhubhanaswer', '712726', 'Odisha', '600.50');
+
+insert into product_master values('P003', 'Pants', '400', '600');
+insert into product_master values('P004', 'Sari', '400', '800');
+
+insert into salesman_master values('S001', 'Souhit Paul', 'Kolkata', '712705', 'West Bengal', '20000');
+insert into salesman_master values('S002', 'Arpan Kundu', 'Kolkata', '712705', 'West Bengal', '21000');
+insert into salesman_master values('S003', 'Aninda Bag', 'Mumbai', '712715', 'Maharastra', '15000');
+insert into salesman_master values('S004', 'Sayan Pal', 'Mumbai', '712715', 'Maharastra', '16000');
+insert into salesman_master values('S005', 'Rupam Kole', 'Chennai', '712720', 'Kerala', '20000');
+
+insert into sales_order values('O002', to_date('2025-03-10', 'yyyy-mm-dd'), 'S001', 'P', to_date('2025-03-18', 'yyyy-mm-dd'));
+insert into sales_order values('O003', to_date('2025-03-09', 'yyyy-mm-dd'), 'S002', 'F', to_date('2025-03-19', 'yyyy-mm-dd'));
+insert into sales_order values('O004', to_date('2025-03-10', 'yyyy-mm-dd'), 'S002', 'F', to_date('2025-03-17', 'yyyy-mm-dd'));
+insert into sales_order values('O005', to_date('2025-03-11', 'yyyy-mm-dd'), 'S005', 'F', to_date('2025-03-22', 'yyyy-mm-dd'));
+
+insert into sales_order_details values('O002', 'P001', '15', 500);
+insert into sales_order_details values('O003', 'P002', '12', 550);
+insert into sales_order_details values('O002', 'P003', '7', 700);
+
+select * from client_master where name like '--a%';
+
+select * from client_master where city like 'K%';
+
+select * from client_master where city='Mumbai' or city='Kolkata';
+or,
+select * from client_master where city in ('Mumbai', 'Kolkata');
+
+select * from client_master where baldue>1000;
+
+
+SELECT * FROM Sales_Order WHERE TO_CHAR(order_date, 'MM') = '06';
+or,
+select * from sales_order where extract(month from order_date)=3;
+or,
+select * from sales_order where order_date like '__-MAR-__';
+
+
+select * from client_master where client_no='C001' or client_no='C003';
+
+select description from product_master where sell_price>500 and sell_price<=750;
+
+select count(*) as total_orders from sales_order;
+
+select max(sell_price) as max_price, min(sell_price) as min_price from product_master;
+
+select count(city) from client_master where city='Kolkata';
+
+select count(sell_price) as price_less_than_500 from product_master where sell_price <= 500;
+
+select order_no, extract(day from order_date) as order_day from sales_order;
+
+select to_char(order_date, 'DD-FMMonth-YY') as order_date from sales_order;
+
+(Today's date): select to_char(sysdate+20, 'DD-FMMonth-YY') from dual;
+
+select * from sales_order where order_date = sysdate + 20;
+
+select name from client_master where BalDue = (select max(BalDue) from client_master);
+
+select max(baldue) - min(baldue) as BalDue_difference from client_master;
+
+update salesman_master set sal_amt = sal_amt+1000;
+
+
+create table employee(
+emp_no varchar2(10) check (emp_no like 'E%') primary key,
+name varchar2(50) not null,
+dob Date not null,
+sex varchar2(10) check (sex='Male' or sex = 'Female') not null,
+address varchar2(100) not null,
+salary number(8,2) check (salary > 0) not null
+);
+
+create table company(
+comp_no varchar2(10) check (comp_no like 'C%') primary key,
+name varchar2(50) not null,
+address varchar2(100) not null
+);
+
+create table works(
+emp_no varchar2(10) references employee(emp_no) on delete cascade,
+comp_no varchar2(10) references company(comp_no) on delete cascade
+);
+
+insert into employee values('E001', 'Abhirup Bag', to_date('17-03-2002', 'DD-MM-YYYY'), 'Male', 'Krishnarampur', '80000');
+insert into employee values('E002', 'Arpan Kundu', to_date('05-04-2002', 'DD-MM-YYYY'), 'Male', 'Baruipara', '70000');
+insert into employee values('E003', 'Souhit Paul', to_date('10-08-2002', 'DD-MM-YYYY'), 'Male', 'Baruipara', '75000');
+insert into employee values('E004', 'Arnab Chattopadhyay', to_date('10-09-2004', 'DD-MM-YYYY'), 'Male', 'Kolkata', '90000');
+insert into employee values('E005', 'Aniket Ghosh', to_date('11-09-2004', 'DD-MM-YYYY'), 'Male', 'Kolkata', '87000');
+insert into employee values('E006', 'Parna Roy', to_date('11-09-2004', 'DD-MM-YYYY'), 'Female', 'Kolkata', '95000');
+insert into employee values('E007', 'Abhishikta Roy', to_date('11-09-2004', 'DD-MM-YYYY'), 'Female', 'Kolkata', '95000');
+
+insert into company values('C001', 'Whipro', 'Kolkata');
+insert into company values('C002', 'TCS', 'Kolkata');
+insert into company values('C003', 'Cognigent', 'Chennai');
+insert into company values('C004', 'Infosis', 'Bengaluru');
+insert into company values('C005', 'Flipkart', 'Delhi');
+insert into company values('C006', 'Clifford Corp', 'Delhi');
+
+insert into works values('E001', 'C001');
+insert into works values('E002', 'C001');
+insert into works values('E003', 'C003');
+insert into works values('E004', 'C002');
+insert into works values('E005', 'C005');
+insert into works values('E006', 'C006');
+insert into works values('E007', 'C006');
+
+select name from employee where emp_no = (select emp_no from works where comp_no = 'C002');
+
+select name from employee where emp_no = (select emp_no from works where comp_no = 'C004');
+
+select * from employee where emp_no in (select emp_no from works where comp_no in (select comp_no from company where name = 'Clifford Corp'));
+
+select * from employee where name like '%a';
+
+select * from employee where extract(year from dob) between 1999 and 2011;

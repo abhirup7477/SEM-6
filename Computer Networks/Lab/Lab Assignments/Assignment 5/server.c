@@ -8,23 +8,21 @@
 #define key 1234
 #define port 4444
 #define size 50
-#define path "socket_path"
 
 void bitstuffing(char *str, char *result){
-    int n = strlen(str), i=0, j=0, count = 0;
+    int n = strlen(str), i=0, j=0, count = 0,flag = 0;
     while(i < n){
         result[j++] = str[i];
         if(str[i] == '0'){
-            if(count == 4){
-                result[j++] = '1';
-                count = 0;
-            }
-            else{
-                count ++;
-            }
-        }
+		count = 0;
+		flag = 1;
+	}
         else{
-            count = 0;
+        	count ++;
+		if(count == 5 && flag == 1){
+			result[j++] = '0';
+			flag = 0;
+		}
         }
         i++;
     }
@@ -32,16 +30,15 @@ void bitstuffing(char *str, char *result){
 }
 
 void main(){
-    struct sockaddr_in addr, caddr;
+    struct sockaddr_in addr , caddr;
     int sfd, cfd, caddr_len;
     char msg[2*size], result[2*size];
-    unlink(path);
 
     sfd = socket(AF_INET, SOCK_STREAM, 0);
 
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    addr.sin_port = htons(4444);
+    addr.sin_port = htons(port);
 
     bind(sfd, (struct sockaddr *) &addr, sizeof(addr));
     listen(sfd, 1);

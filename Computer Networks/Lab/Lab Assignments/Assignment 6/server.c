@@ -5,13 +5,30 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <arpa/inet.h>
+#include <pthread.h>
+#include <signal.h>
 
 #define key 1234
 #define port 4444
 #define size 50
-#define path "socket_path"
+#define ip "127.0.0.1"
+#define backlog 5
+
+typedef struct Clients{
+	int cfd, sfd;
+	int i;
+}client;
+
+void handler(int signum){
+	if(signum == SIGINT){
+		printf("\nServer is terminating\n");
+		signal(SIGINT, SIG_DFL);
+		kill(getpid(), SIGINT);
+	}
+}
 
 int isValid(char *str){
+	signal(SIGINT, handler);
     int i, j, count=0, n = strlen(str), sum=0;
 
     if(str[0] == '.' || str[n-1] == '.')
@@ -38,35 +55,20 @@ int isValid(char *str){
 
         }
     }
-    if(count != 3)
+    if(count != 3 || sum > 255)
         return 0;
     return 1;
 }
 
-void main(){
-    struct sockaddr_in addr, caddr;
-    int sfd, cfd, caddr_len, ans;
-    char msg[size];
-    unlink(path);
-
-    sfd = socket(AF_INET, SOCK_STREAM, 0);
-
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    addr.sin_port = htons(4444);
-
-    bind(sfd, (struct sockaddr *) &addr, sizeof(addr));
-    listen(sfd, 1);
-
-    caddr_len = sizeof(caddr);
-    cfd = accept(sfd, (struct sockaddr *)&addr, &caddr_len);
-
-    while(1){
-        printf("Server is waiting\n\n");
-
-        read(cfd, msg, sizeof(msg));
+void *check(void *args){
+	client c = *(client*)args;
+	char msg[size];
+	int ans;
+	while(1){
+		read(c.cfd, msg, sizeof(msg));
         if(!strcmp(msg, "0000"))
             break;
+        printf("Client - %d\n",c.i);
         printf("Received data : %s\n",msg);
 
         ans = isValid(msg);
@@ -76,11 +78,41 @@ void main(){
             strcpy(msg, "Invalid ip address!");
 
         puts(msg);
-        write(cfd, msg, sizeof(msg));
+        write(c.cfd, msg, sizeof(msg));
+        
         puts("");
+	}
+	c.i--;
+	pthread_exit(NULL);
+}
+
+void main(){
+    struct sockaddr_in addr, caddr;
+    int sfd, cfd, caddr_len;
+
+    sfd = socket(AF_INET, SOCK_STREAM, 0);
+
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr(ip);
+    addr.sin_port = htons(4444);
+
+    bind(sfd, (struct sockaddr *) &addr, sizeof(addr));
+    listen(sfd, backlog);
+
+    caddr_len = sizeof(caddr);
+	
+	pthread_t th;
+	client c;
+	c.sfd = sfd;
+	c.i = 0;
+    while(1){
+        printf("Server is waiting\n\n");
+		cfd = accept(sfd, (struct sockaddr *)&addr, &caddr_len);
+		c.cfd = cfd;
+		pthread_create(&th, NULL, (void*)check, (void *)&c);
+        printf("Created thread : %d\n",++c.i);        
     }
     printf("Server is terminating\n");
     usleep(1000);
-    close(cfd);
-    unlink(path);
+    close(sfd);
 }

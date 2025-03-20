@@ -14,13 +14,12 @@ void main(){
     struct sockaddr_in addr;
     int sfd;
     char msg[2*size];
-    unlink(path);
 
     sfd = socket(AF_INET, SOCK_STREAM, 0);
 
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    addr.sin_port = htons(4444);
+    addr.sin_port = htons(port);
 
     connect(sfd, (struct sockaddr *)&addr, sizeof(addr));
 
