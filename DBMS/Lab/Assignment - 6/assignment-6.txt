@@ -1,0 +1,133 @@
+create table Customer_address(
+addr_id varchar2(5) check (addr_id like 'A%') primary key,
+city varchar2(20) not null,
+state varchar2(20) not null,
+pincode number(6) not null
+);
+
+create table customer(
+c_id varchar2(5) check (c_id like 'C%') primary key,
+dob date not null,
+fname varchar2(20) not null,
+mname varchar2(20),
+lname varchar2(20) not null,
+addr_id varchar2(5) references Customer_address(addr_id) on delete cascade not null
+);
+
+create table Customer_ph_no(
+c_id varchar2(5) references Customer(c_id) on delete cascade not null,
+ph_no number(10),
+primary key (c_id, ph_no)
+);
+
+create table car(
+car_lno varchar(20) primary key,
+c_id varchar2(5) references Customer(c_id) on delete cascade not null,
+company varchar2(20) not null,
+model varchar2(20) not null
+);
+
+create table FirstHand(
+car_lno varchar2(20) references car(car_lno) on delete cascade not null,
+ownership_type varchar2(1) default 'F' check (ownership_type='F'),
+primary key (car_lno)
+);
+
+create table SecondHand(
+car_lno varchar2(20) references car(car_lno) on delete cascade not null,
+ownership_type varchar2(1) default 'F' check (ownership_type='F' or ownership_type='S'),
+primary key (car_lno)
+);
+
+create table Accident(
+fir_no varchar2(10) check (fir_no like 'FIR%') primary key,
+car_lno varchar2(20) references car(car_lno) on delete cascade not null,
+accident_date date not null,
+accident_loc varchar2(20) not null,
+damage_amt number(8, 2) not null
+);
+
+insert all
+into customer_address values ('A1', 'Kolkata', 'West Bengal', 700156)
+into customer_address values ('A2', 'Krishnarampur', 'West Bengal', 712702)
+into customer_address values ('A3', 'Chennai', 'Kerala', 700213)
+into customer_address values ('A4', 'Mumbai', 'Maharastra', 700056)
+into customer_address values ('A5', 'Bengaluru', 'Karnataka', 700256)
+select 1 from dual;
+
+insert all
+into customer values ('C1', to_date('17-03-2002', 'DD-MM-YYYY'), 'Abhirup', '', 'Bag', 'A2')
+into customer values ('C2', to_date('15-06-2003', 'DD-MM-YYYY'), 'ABC', 'Roy', 'Choudhuri', 'A1')
+into customer values ('C3', to_date('01-01-1945', 'DD-MM-YYYY'), 'Gokul', 'Chandra', 'Bag', 'A2')
+into customer values ('C4', to_date('22-05-2004', 'DD-MM-YYYY'), 'Abaninda', 'Mukesh', 'Singh', 'A3')
+into customer values ('C5', to_date('27-12-2002', 'DD-MM-YYYY'), 'XYZ', 'Chandra','Das', 'A2')
+select 1 from dual;
+
+insert all
+into customer_ph_no values ('C1', 9339316128)
+into customer_ph_no values ('C1', 6296885021)
+into customer_ph_no values ('C2', 7477516708)
+into customer_ph_no values ('C3', 9785473428)
+into customer_ph_no values ('C4', 9339316128)
+into customer_ph_no values ('C4', 9002168757)
+into customer_ph_no values ('C5', 8972502145)
+select 1 from dual;
+
+INSERT ALL
+INTO car VALUES ('WB01AB1234', 'C1', 'Maruti Suzuki', 'Swift')
+INTO car VALUES ('WB01CD5678', 'C1', 'Hyundai', 'Creta')
+INTO car VALUES ('MH12XY9101', 'C2', 'Mahindra', 'Scorpio')
+INTO car VALUES ('MH14LM2345', 'C2', 'Toyota', 'Innova')
+INTO car VALUES ('KA05GH6789', 'C3', 'Tata', 'Nexon')
+INTO car VALUES ('TN07JK3456', 'C4', 'Mahindra', 'XUV700')
+INTO car VALUES ('TN07JK3489', 'C5', 'Mahindra', 'Scorpio')
+INTO car VALUES ('AIBPC2010', 'C5', 'Toyota', 'Innova')
+SELECT 1 FROM DUAL;
+
+insert all
+into FirstHand values ('WB01AB1234', 'F')
+into FirstHand values ('MH14LM2345', 'F')
+into FirstHand values ('KA05GH6789', 'F')
+into FirstHand values ('TN07JK3489', 'F')
+select 1 from dual;
+
+insert all
+into SecondHand values ('WB01CD5678', 'S')
+into SecondHand values ('MH12XY9101', 'S')
+into SecondHand values ('TN07JK3456', 'S')
+into SecondHand values ('AIBPC2010', 'S')
+select 1 from dual;
+
+insert all
+into accident values ('FIR1', 'WB01AB1234', to_date('12-03-2010', 'DD-MM-YYYY'), 'Bidhannagar', '30000')
+into accident values ('FIR2', 'MH14LM2345', to_date('15-11-2024', 'DD-MM-YYYY'), 'SectorV', '10000')
+into accident values ('FIR3', 'KA05GH6789', to_date('01-02-2025', 'DD-MM-YYYY'), 'SectorV', '15000')
+into accident values ('FIR4', 'TN07JK3489', to_date('15-02-2025', 'DD-MM-YYYY'), 'Navi Mumbai', '19000')
+into accident values ('FIR5', 'WB01CD5678', to_date('16-09-2010', 'DD-MM-YYYY'), 'Navi Mumbai', '8000')
+into accident values ('FIR6', 'MH12XY9101', to_date('26-11-2019', 'DD-MM-YYYY'), 'Delhi', '23476.67')
+into accident values ('FIR7', 'TN07JK3456', to_date('20-10-2017', 'DD-MM-YYYY'), 'Kerala', '21100.50')
+into accident values ('FIR271', 'AIBPC2010', to_date('24-04-2023', 'DD-MM-YYYY'), 'Ladakh', '50000.50')
+select 1 from dual;
+
+1. Find the total number of people who owned cars that were involved in accidents in 2010.
+select count(*) as number_of_people from
+customer join car on customer.c_id = car.c_id
+join accident on car.car_lno = accident.car_lno
+where extract(year from accident.accident_date) = 2010;
+
+2. Find the number of accidents in which the cars belonging to “XYZ” were involved.
+select count(*) as number_of_accidents from
+customer join car on customer.c_id = car.c_id
+join accident on car.car_lno = accident.car_lno
+where customer.fname = 'XYZ';
+
+3. Add a new accident to the database; assume any values for required attributes.
+insert into accident 
+values ('FIR272', 'TN07JK3456', to_date('17-03-2025', 'DD-MM-YYYY'), 'Ladakh', '5000.50');
+
+4. Delete the model ‘Scorpio belonging to “ABC”.
+delete from car where c_id in ( select c_id from customer where fname = 'ABC') and model = 'Scorpio';
+
+5. Update the damage amount for the car with license number “AIBPC2010” in the accident with report number “FIR271” to Rs. 5000.
+update accident set damage_amt = 5000 where car_lno = 'AIBPC2010' and fir_no = 'FIR271';
+

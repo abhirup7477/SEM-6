@@ -1,6 +1,16 @@
-#include "udp.h"
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
 
-void hammingCode(char * str, char *result){
+#define size 30
+
+void readInput(char *str, char *prompt, int n){
+    printf("%s",prompt);
+    fgets(str, n, stdin);
+    str[strlen(str) - 1] = '\0';
+}
+
+void hammingCode(char *str, char *result){
     int m, n, r=0, i, j, k, l, count;
     m = strlen(str);
     while(pow(2, r) < (m + r + 1))
@@ -19,7 +29,7 @@ void hammingCode(char * str, char *result){
             result[i] = str[k++];
     }
     result[i] = '\0';
-    // puts(result);
+    puts(result);
 
     k = 0;
     while(k < r){
@@ -45,40 +55,17 @@ void hammingCode(char * str, char *result){
             result[n-j] = '1';
         else 
             result[n-j] = '0';
-        // printf("r[%d] = %c\n",j, result[n-j]);
+        printf("r[%d] = %c\n",j, result[n-j]);
         k++;
     }
+    puts(result);
 }
 
 void main(){
-    int sfd, caddr_len, n;
-    struct sockaddr_in addr, caddr;
-    char buff[size], result[2*size];
-    sfd = socket(AF_INET, SOCK_DGRAM, 0);
-
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = inet_addr(ip);
-    addr.sin_port = htons(port);
-
-    caddr_len = sizeof(caddr);
-
-    bind(sfd, (struct sockaddr*)&addr, sizeof(addr));
-
+    char str[size], result[2*size];
     while(1){
-        printf("Server is waiting.\n\n");
-        n = recvfrom(sfd, (void*)buff, sizeof(buff), 0, (struct sockaddr *)&caddr, &caddr_len);
-        buff[n] = '\0';
-
-        if(!strcmp(buff, "0000"))
-            break;
-
-        printf("Received data : %s\n",buff);
-        hammingCode(buff, result);
-
-        printf("Hamming Code = %s\n",result);
-        sendto(sfd, (void*)result, sizeof(result), 0, (struct sockaddr *)&caddr, sizeof(caddr));
+        readInput(str, "Enter the data : ", size);
+        hammingCode(str, result); 
         puts("");
     }
-    printf("\nServer is terminating\n");
-    close(sfd);
 }

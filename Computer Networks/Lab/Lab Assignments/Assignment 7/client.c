@@ -3,7 +3,7 @@
 void main(){
     int sfd, addr_len, n;
     struct sockaddr_in addr;
-    char buff[size];
+    char buff[size], result[2*size];
     sfd = socket(AF_INET, SOCK_DGRAM, 0);
 
     addr.sin_family = AF_INET;
@@ -22,10 +22,9 @@ void main(){
         if(!strcmp(buff, "0000"))
             break;
 
-        n = recvfrom(sfd, (void*)buff, sizeof(buff), 0, (struct sockaddr *)&addr, &addr_len);
-        buff[n] = '\0';
-        puts(buff);
-        puts("");
+        n = recvfrom(sfd, (void*)result, sizeof(result), 0, (struct sockaddr *)&addr, &addr_len);
+        result[n] = '\0';
+        printf("Hamming Code = %s\n\n",result);
     }
     printf("\nClient is terminating\n");
     close(sfd);

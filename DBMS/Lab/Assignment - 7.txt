@@ -1,0 +1,8 @@
+create table doctor(
+ssn varchar(10) primary key,
+FirstName varchar(20) not null,
+LastName varchar(20) not null,
+speciality varchar2(20),
+YearsOfExperience INT,
+PhoneNum number(10) check (phonenum > 999999999 and phonenum < 10000000000)
+);

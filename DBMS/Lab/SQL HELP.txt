@@ -1,0 +1,29 @@
+create table new_product_master(
+product_no varchar2(6) check (product_no like 'P%') primary key,
+description varchar2(15) not null,
+qty_on_hand number(8) not null,
+sell_price number(8, 2) check(sell_price > 0) not null,
+cost_price number(8, 2) check(cost_price > 0) not null
+);
+
+create table C(
+aid varchar2(5) references A(aid),
+bid varchar2(5) references B(bid),
+primary key (aid, bid)
+);
+
+create table D(
+aid varchar2(5),
+foreign key (aid) references A(aid),
+loc varchar2(30),
+primary key (aid, loc)
+);
+or,
+create table D(
+aid varchar2(5) references A(aid),
+loc varchar2(30),
+primary key (aid, loc)
+);
+
+drop table customer_ph_no cascade constraints;
+drop table customer cascade constraints;
