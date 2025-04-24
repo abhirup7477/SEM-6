@@ -1,0 +1,11 @@
+drop table producer cascade constraints;
+drop table SONG cascade constraints;
+drop table COMPOSER cascade constraints;
+drop table RECORDINGARTIST cascade constraints;
+drop table CD cascade constraints;
+drop table SONGCOMPOSER cascade constraints;
+drop table CDTRACK cascade constraints;
+drop table CDRECORDINGARTIST cascade constraints;
+drop table CONTRACT cascade constraints;
+drop table COUNTSONG cascade constraints;
+drop table SONGRECORDINGARTIST cascade constraints;

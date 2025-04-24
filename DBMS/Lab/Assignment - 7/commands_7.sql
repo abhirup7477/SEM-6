@@ -6,6 +6,10 @@ create table doctor(
     YearsOfExperience number(2),
     PhoneNum number(10) check (phonenum > 999999999 and phonenum < 10000000000)
 );
+set linesize 50;
+desc doctor;
+
+set linesize 300;
 
 insert all
     into doctor values ('D001', 'John', 'Smith', 'Cardiologist', 25, 9876543219)
@@ -15,6 +19,7 @@ insert all
     into doctor values ('D005', 'Abhishikta', 'Roy', 'Cardiologist', 2, 8972505145)
     into doctor values ('D006', 'Parna', 'Roy', 'Gynologist', 2, 9782647517)
 select * from dual;
+select * from doctor;
 
 create table patient(
     ssn varchar2(5) check (ssn like 'P%') primary key,
@@ -24,6 +29,10 @@ create table patient(
     dob date,
     primary_doctor_ssn varchar2(5) references doctor(ssn) on delete cascade
 );
+set linesize 50;
+desc patient;
+
+set linesize 300;
 
 insert all
     into patient values ('P001', 'Sayantan', 'Sarkar', 'Lahore', to_date('29-02-1948', 'DD-MM-YYYY'), 'D001')
@@ -32,12 +41,17 @@ insert all
     into patient values ('P004', 'Souhit', 'Paul', 'Baruipara', to_date('10-08-2002', 'DD-MM-YYYY'), 'D002')
     into patient values ('P005', 'Ajay', 'Bag', 'Krishnarampur', to_date('01-01-1977', 'DD-MM-YYYY'), 'D001')
 select * from dual;
+select * from patient;
 
 create table medicine(
     TradeName varchar2(10) primary key,
     UnitPrice number(5,2) not null,
     GenericFlag varchar2(1) check (genericflag in ('Y', 'N')) 
 );
+set linesize 50;
+desc medicine;
+
+set linesize 300;
 
 insert all
 	into medicine values ('Aspirin', '10.50', 'Y')
@@ -46,12 +60,17 @@ insert all
 	into medicine values ('RantacD', '3.50', 'Y')
 	into medicine values ('Pyrigesic', '2.50', 'Y')
 select * from dual;
+select * from medicine;
 
 create table prescription(
     Id varchar2(5) check (Id like 'PR%') primary key,
     Doctor_ssn varchar2(5) references doctor(ssn) on delete cascade,
-    Patient_snn varchar2(5) references patient(ssn) on delete cascade
+    Patient_ssn varchar2(5) references patient(ssn) on delete cascade
 );
+set linesize 50;
+desc prescription;
+
+set linesize 300;
 
 insert all
     into prescription values ('PR001', 'D001', 'P001')
@@ -62,6 +81,7 @@ insert all
     into prescription values ('PR006', 'D004', 'P002')
     into prescription values ('PR007', 'D005', 'P003')
 select * from dual;
+select * from prescription;
 
 create table Prescription_Medicine(
     Prescription_Id varchar2(5) references prescription(Id) on delete cascade,
@@ -69,6 +89,10 @@ create table Prescription_Medicine(
     NumOfUnits number(5),
     primary key (Prescription_Id, TradeName)
 );
+set linesize 50;
+desc Prescription_Medicine;
+
+set linesize 300;
 
 insert all
     into Prescription_Medicine values ('PR001', 'Aspirin', 2)
@@ -81,12 +105,15 @@ insert all
     into Prescription_Medicine values ('PR006', 'Vitamin', 7)
     into Prescription_Medicine values ('PR007', 'ORS', 6)
 select * from dual;
+select * from Prescription_Medicine;
 
 create table SeniorD(
     ssn varchar2(5) primary key,
     TLicence varchar2(10),
     foreign key (ssn) references doctor(ssn) on delete cascade
 );
+set linesize 50;
+desc SeniorD;
 
 create table JuniorD(
     ssn varchar2(5) primary key,
@@ -94,6 +121,10 @@ create table JuniorD(
     TEnd date,
     foreign key (ssn) references doctor(ssn) on delete cascade
 );
+set linesize 50;
+desc JuniorD;
+
+set linesize 300;
 
 insert all
     into SeniorD values ('D001', 'TL001')
@@ -103,6 +134,8 @@ insert all
     into JuniorD values ('D005', to_date('01-01-2024', 'DD-MM-YYYY'), to_date('31-12-2024', 'DD-MM-YYYY'))
     into JuniorD values ('D006', to_date('01-01-2024', 'DD-MM-YYYY'), to_date('31-12-2024', 'DD-MM-YYYY'))
 select * from dual;
+select * from SeniorD;
+select * from JuniorD;
 
 -- 1. List the trade name of generic medicine with unit price less than $50.
 select tradename from medicine where genericflag = 'Y' and unitprice < 50;
@@ -114,7 +147,9 @@ select d.firstname, d.lastname from
 
 -- 3. List the first and last name of doctors who are not primary doctors to any patient.
 select d.firstname, d.lastname from doctor d 
-    where ssn not in (select primary_doctor_ssn from patient);
+where ssn not in (
+    select primary_doctor_ssn from patient
+);
 
 -- 4. For medicines written in more than 20 prescriptions, report the trade name and the total number of units prescribed.
 select tradename from 
@@ -123,20 +158,21 @@ select tradename from
     where count > 20;
 
 -- 5. List the SSN of patients who have ʻAspirinʼ and ʻVitaminʼ trade names in one prescription.
-select patient_ssn from prescription where id in 
-    (select prescription_id from prescription_medicine 
+select patient_ssn from prescription where id in (
+    select prescription_id from prescription_medicine 
     where tradename = 'Aspirin' or tradename = 'Vitamin' 
-    group by prescription_id having count(*)>1);
+    group by prescription_id having count(*)>1
+);
 
 -- 6. List the SNN of distinct patients who have ʻAspirinʼ prescribed to them by doctor named ʻJohn Smithʼ.
 select distinct p.patient_ssn from 
-    doctor d join prescription p on d.ssn = p.doctor_ssn 
-    join prescription_medicine pm on p.id = pm.prescription_id 
-    where d.firstname='John' and d.lastname='Smith' and tradename='Aspirin';
+doctor d join prescription p on d.ssn = p.doctor_ssn 
+join prescription_medicine pm on p.id = pm.prescription_id 
+where d.firstname='John' and d.lastname='Smith' and tradename='Aspirin';
 
 -- 7. List the first and last name of patients who have no prescriptions written by doctors other than their primary doctors.
 select p.firstname, p.lastname 
-    from patient p where ssn not in (
-        select patient_ssn from prescription 
-        where doctor_ssn != p.primary_doctor_ssn
-    );
+from patient p where ssn not in (
+    select patient_ssn from prescription 
+    where doctor_ssn != p.primary_doctor_ssn
+);

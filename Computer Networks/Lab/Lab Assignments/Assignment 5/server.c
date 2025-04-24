@@ -8,21 +8,22 @@
 #define key 1234
 #define port 4444
 #define size 50
+#define path "socket_path"
 
 void bitstuffing(char *str, char *result){
     int n = strlen(str), i=0, j=0, count = 0,flag = 0;
     while(i < n){
         result[j++] = str[i];
         if(str[i] == '0'){
-		count = 0;
-		flag = 1;
-	}
+            count = 0;
+            flag = 1;
+	    }
         else{
         	count ++;
-		if(count == 5 && flag == 1){
-			result[j++] = '0';
-			flag = 0;
-		}
+            if(count == 5 && flag == 1){
+                result[j++] = '0';
+                flag = 0;
+            }
         }
         i++;
     }

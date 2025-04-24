@@ -8,7 +8,7 @@ void *sending(void *arg){
     while(1){
         fgets(msg, size, stdin);
         msg[strlen(msg) - 1] = '\0';
-        sendto(sfd, (void *)msg, sizeof(msg), 0, (struct sockaddr *)&addr, (sizeof(addr)));
+        sendto(sfd, (void *)msg, sizeof(msg), 0, (struct sockaddr *)&caddr, (sizeof(caddr)));
     }
 }
 
@@ -20,7 +20,9 @@ void *receiving(void *arg){
         n = recvfrom(sfd, (void*)msg, (sizeof(msg)), 0, (struct sockaddr *)&caddr, &caddr_len);
         msg[n] = '\0';
         printf("Received data : %s\n\n",msg);
+        sleep(1);
     }
+    pthread_exit(NULL);
 }
 
 void main(){
@@ -36,7 +38,10 @@ void main(){
 
     bind(sfd, (struct sockaddr *)&addr, sizeof(addr));
 
-    pthread_t th;
-    pthread_create(&th, NULL, (void *)sending, NULL);
-    pthread_create(&th, NULL, (void *)receiving, NULL);
+    pthread_t th1, th2;
+    pthread_create(&th1, NULL, (void *)sending, NULL);
+    pthread_create(&th2, NULL, (void *)receiving, NULL);
+
+    pthread_join(th1, NULL);
+    pthread_join(th2, NULL);
 }
