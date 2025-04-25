@@ -49,3 +49,16 @@ insert all
 	into showing values ('F007', 'C004')
 	into showing values ('F003', 'C005')
 select * from dual;
+
+select c.cname, c.city, count(*) as num_films from cinema c join showing s on c.cid = s.cid group by c.cname, c.city order by c.city, c.cname;
+
+SELECT DISTINCT f.title, f.director_name
+FROM Film f
+JOIN Showing s ON f.fid = s.fid
+WHERE f.budget >= 100;
+
+select * from cinema c join showing s on c.cid = s.cid where s.fid in (select fid from film where genre = 'Drama') and s.fid not in (select fid from film where genre = 'Romance');
+-- or
+select distinct c.owner_name from cinema c join showing s on c.cid = s.cid join film f on f.fid = s.fid where f.genre = 'Drama' and c.cid not in (select c2.cid from cinema c2 join showing s2 on c2.cid = s2.cid join film f2 on f2.fid = s2.fid where f2.genre = 'Romance');
+
+select * from film where fid in (select distinct fid from showing where cid in (select cid from cinema where city = 'Mumbai')) and budget > (select min(f.budget) from film f join showing s on f.fid = s.fid where s.cid in (select cid from cinema where city = 'Rajkot'));
